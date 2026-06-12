@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Badge, Button, Card, SectionTitle } from "@/components/ui";
-import { Check, Eye, EyeOff, KeyRound, ShieldCheck } from "lucide-react";
+import { apiGet, apiPut } from "@/lib/api";
+import { Check, Eye, EyeOff, KeyRound, Loader2, ShieldCheck, Store, UserCircle } from "lucide-react";
 
 const models = [
   { id: "claude-opus-4-8", label: "Claude Opus 4.8", desc: "최고 품질 리포트" },
@@ -16,12 +17,81 @@ export default function AdminPage() {
   const [show, setShow] = useState(false);
   const [model, setModel] = useState("claude-sonnet-4-6");
   const [saved, setSaved] = useState(false);
+
+  // 내 프로필 / 지점
+  const [profile, setProfile] = useState({ name: "", honorific: "프로", studio: "" });
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+
+  useEffect(() => {
+    apiGet<{ trainer: { name: string; honorific: string; studio: string } }>("/api/trainer").then((d) => {
+      if (d?.trainer) setProfile({ name: d.trainer.name, honorific: d.trainer.honorific, studio: d.trainer.studio });
+    });
+  }, []);
+
+  const saveProfile = async () => {
+    setProfileSaving(true);
+    await apiPut("/api/trainer", profile);
+    setProfileSaving(false);
+    setProfileSaved(true);
+    setTimeout(() => setProfileSaved(false), 1500);
+  };
   const [prompt, setPrompt] = useState(
     "너는 따뜻하고 전문적인 퍼스널 트레이너야. 세션 메모를 바탕으로 고객이 동기부여를 느낄 수 있는 리포트를 작성해. 성과·다음 목표·격려를 포함하고, 친근한 존댓말과 적절한 이모지를 사용해."
   );
 
   return (
-    <AppShell title="관리자" subtitle="AI · 발송 채널 · 결제 · 통계">
+    <AppShell title="관리자" subtitle="내 프로필 · AI · 발송 채널 · 통계">
+      {/* 내 프로필 / 지점 */}
+      <SectionTitle title="내 프로필 · 지점" />
+      <Card className="space-y-3 p-4">
+        <div className="flex items-center gap-2">
+          <UserCircle size={16} className="text-ink-600" />
+          <p className="text-sm font-bold text-ink-900">트레이너 정보</p>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="col-span-2">
+            <label className="text-xs font-semibold text-ink-500">이름</label>
+            <input
+              value={profile.name}
+              onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
+              placeholder="김민지"
+              className="mt-1 w-full rounded-xl border border-ink-200 p-3 text-sm outline-none focus:border-brand-400"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-ink-500">호칭</label>
+            <select
+              value={profile.honorific}
+              onChange={(e) => setProfile((p) => ({ ...p, honorific: e.target.value }))}
+              className="mt-1 w-full rounded-xl border border-ink-200 p-3 text-sm outline-none focus:border-brand-400"
+            >
+              <option value="프로">프로</option>
+              <option value="코치">코치</option>
+              <option value="트레이너">트레이너</option>
+              <option value="쌤">쌤</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className="flex items-center gap-1 text-xs font-semibold text-ink-500">
+            <Store size={12} /> 지점 / 스튜디오
+          </label>
+          <input
+            value={profile.studio}
+            onChange={(e) => setProfile((p) => ({ ...p, studio: e.target.value }))}
+            placeholder="예: 코어핏 스튜디오 (강남)"
+            className="mt-1 w-full rounded-xl border border-ink-200 p-3 text-sm outline-none focus:border-brand-400"
+          />
+        </div>
+        <p className="rounded-xl bg-ink-50 p-2.5 text-[11px] text-ink-500">
+          미리보기: <b className="text-ink-900">{profile.name || "이름"} {profile.honorific}님</b> · {profile.studio || "지점 미설정"}
+        </p>
+        <Button className="w-full" onClick={saveProfile} disabled={profileSaving}>
+          {profileSaving ? <Loader2 size={16} className="animate-spin" /> : profileSaved ? <><Check size={16} /> 저장됨</> : "프로필 저장"}
+        </Button>
+      </Card>
+
       {/* 운영 통계 */}
       <SectionTitle title="이번 달 현황" />
       <div className="grid grid-cols-2 gap-2">

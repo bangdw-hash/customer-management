@@ -12,13 +12,14 @@ import {
   greetingFor,
   reEnrollTargets,
   toISODate,
-  trainer,
 } from "@/lib/mock";
 import { useNow } from "@/lib/useNow";
+import { useTrainer } from "@/lib/useTrainer";
 import { AlertTriangle, CalendarClock, Mic, QrCode, Sparkles, TrendingUp, UserPlus } from "lucide-react";
 
 export default function Dashboard() {
   const now = useNow();
+  const t = useTrainer();
   const todayKey = now ? toISODate(now) : "";
   const today = now ? getBookings(now).filter((b) => b.date === todayKey) : [];
   const targets = reEnrollTargets();
@@ -36,9 +37,9 @@ export default function Dashboard() {
           </p>
         </div>
         <h1 className="mt-2 text-2xl font-extrabold">
-          {now ? greetingFor(now) : "안녕하세요"}, {trainer.name} {trainer.honorific}님 👋
+          {now ? greetingFor(now) : "안녕하세요"}, {t.name} {t.honorific}님 👋
         </h1>
-        <p className="mt-1 text-sm text-white/80">{trainer.studio}</p>
+        <p className="mt-1 text-sm text-white/80">{t.studio}</p>
 
         <div className="mt-5 grid grid-cols-3 gap-2 text-center">
           <div className="rounded-2xl bg-white/15 py-3">

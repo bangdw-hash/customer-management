@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { Button, Card } from "@/components/ui";
-import { getBookingDates, trainer } from "@/lib/mock";
+import { getBookingDates } from "@/lib/mock";
 import { useNow } from "@/lib/useNow";
+import { useTrainer } from "@/lib/useTrainer";
 import { CalendarCheck, CalendarPlus, Check, Clock, MapPin } from "lucide-react";
 
 export default function BookPage() {
   const now = useNow();
+  const t = useTrainer();
   const dates = now ? getBookingDates(now) : [];
 
   const [dateKey, setDateKey] = useState<string | null>(null);
@@ -28,7 +30,7 @@ export default function BookPage() {
         </div>
         <h1 className="mt-5 text-xl font-extrabold text-ink-900">예약이 확정됐어요!</h1>
         <p className="mt-2 text-sm text-ink-500">
-          {activeDate.label} ({activeDate.day}) {slot} · {trainer.name} {trainer.honorific}
+          {activeDate.label} ({activeDate.day}) {slot} · {t.name} {t.honorific}
         </p>
         <Card className="mt-6 w-full p-4 text-left">
           <div className="flex items-center gap-2 text-sm text-ink-700">
@@ -54,10 +56,10 @@ export default function BookPage() {
       <div className="bg-gradient-to-br from-brand-600 via-fuchsia-600 to-pink-600 px-6 pb-6 pt-10 text-white">
         <p className="text-xs text-white/80">PT 예약</p>
         <h1 className="mt-1 text-2xl font-extrabold">
-          {trainer.name} {trainer.honorific}
+          {t.name} {t.honorific}
         </h1>
         <p className="mt-1 flex items-center gap-1 text-sm text-white/80">
-          <MapPin size={14} /> {trainer.studio}
+          <MapPin size={14} /> {t.studio}
         </p>
         <p className="mt-1 text-sm text-white/80">세션 60분 · 1:1 퍼스널 트레이닝</p>
       </div>
