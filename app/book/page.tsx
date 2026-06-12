@@ -2,32 +2,25 @@
 
 import { useState } from "react";
 import { Button, Card } from "@/components/ui";
-import { trainer } from "@/lib/mock";
+import { getBookingDates, trainer } from "@/lib/mock";
+import { useNow } from "@/lib/useNow";
 import { CalendarCheck, CalendarPlus, Check, Clock, MapPin } from "lucide-react";
 
-const dates = [
-  { d: "6/12", day: "금", key: "2026-06-12" },
-  { d: "6/13", day: "토", key: "2026-06-13" },
-  { d: "6/15", day: "월", key: "2026-06-15" },
-  { d: "6/16", day: "화", key: "2026-06-16" },
-];
-
-// 예약 가능 슬롯 (이미 찬 시간은 제외된 상태로 노출)
-const slotsByDate: Record<string, string[]> = {
-  "2026-06-12": ["13:00", "14:00", "16:00", "20:00", "21:00"],
-  "2026-06-13": ["09:00", "11:00", "15:00", "17:00"],
-  "2026-06-15": ["07:00", "10:00", "12:00", "18:00", "19:00"],
-  "2026-06-16": ["08:00", "13:00", "14:00", "20:00"],
-};
-
 export default function BookPage() {
-  const [date, setDate] = useState(dates[0].key);
+  const now = useNow();
+  const dates = now ? getBookingDates(now) : [];
+
+  const [dateKey, setDateKey] = useState<string | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [done, setDone] = useState(false);
 
-  if (done) {
+  // 접속 후 날짜가 준비되면 첫 날짜를 기본 선택
+  const activeKey = dateKey ?? dates[0]?.key ?? null;
+  const activeDate = dates.find((d) => d.key === activeKey);
+
+  if (done && activeDate) {
     return (
       <div className="phone-frame flex min-h-[100dvh] flex-col items-center justify-center p-6 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-100">
@@ -35,7 +28,7 @@ export default function BookPage() {
         </div>
         <h1 className="mt-5 text-xl font-extrabold text-ink-900">예약이 확정됐어요!</h1>
         <p className="mt-2 text-sm text-ink-500">
-          {date.replace("2026-", "").replace("-", "월 ")}일 {slot} · {trainer.name} 코치
+          {activeDate.label} ({activeDate.day}) {slot} · {trainer.name} {trainer.honorific}
         </p>
         <Card className="mt-6 w-full p-4 text-left">
           <div className="flex items-center gap-2 text-sm text-ink-700">
@@ -43,7 +36,7 @@ export default function BookPage() {
             트레이너 구글캘린더에 자동 등록됨
           </div>
           <div className="mt-3 flex items-center gap-2 text-sm text-ink-700">
-            <CalendarPlus size={18} className="text-sky-600" />
+            <CalendarPlus size={18} className="text-pink-600" />
             내 캘린더에 추가 (.ics)
           </div>
         </Card>
@@ -58,13 +51,15 @@ export default function BookPage() {
   return (
     <div className="phone-frame min-h-[100dvh] pb-28">
       {/* 트레이너 헤더 */}
-      <div className="bg-gradient-to-br from-brand-600 to-brand-700 px-6 pb-6 pt-10 text-white">
-        <p className="text-xs text-brand-100">PT 예약</p>
-        <h1 className="mt-1 text-2xl font-extrabold">{trainer.name} 코치</h1>
-        <p className="mt-1 flex items-center gap-1 text-sm text-brand-100">
+      <div className="bg-gradient-to-br from-brand-600 via-fuchsia-600 to-pink-600 px-6 pb-6 pt-10 text-white">
+        <p className="text-xs text-white/80">PT 예약</p>
+        <h1 className="mt-1 text-2xl font-extrabold">
+          {trainer.name} {trainer.honorific}
+        </h1>
+        <p className="mt-1 flex items-center gap-1 text-sm text-white/80">
           <MapPin size={14} /> {trainer.studio}
         </p>
-        <p className="mt-1 text-sm text-brand-100">세션 60분 · 1:1 퍼스널 트레이닝</p>
+        <p className="mt-1 text-sm text-white/80">세션 60분 · 1:1 퍼스널 트레이닝</p>
       </div>
 
       <div className="px-5">
@@ -74,15 +69,19 @@ export default function BookPage() {
           {dates.map((d) => (
             <button
               key={d.key}
-              onClick={() => { setDate(d.key); setSlot(null); }}
+              onClick={() => {
+                setDateKey(d.key);
+                setSlot(null);
+              }}
               className={`flex min-w-[60px] flex-col items-center rounded-2xl px-4 py-3 ${
-                date === d.key ? "bg-brand-600 text-white" : "bg-white text-ink-600 shadow-card"
+                activeKey === d.key ? "bg-brand-600 text-white" : "bg-white text-ink-600 shadow-card"
               }`}
             >
               <span className="text-[11px]">{d.day}</span>
-              <span className="text-base font-extrabold">{d.d}</span>
+              <span className="text-base font-extrabold">{d.label}</span>
             </button>
           ))}
+          {!now && <span className="px-2 py-3 text-sm text-ink-400">불러오는 중…</span>}
         </div>
 
         {/* 시간 선택 */}
@@ -90,7 +89,7 @@ export default function BookPage() {
           <Clock size={15} /> 예약 가능 시간
         </p>
         <div className="grid grid-cols-3 gap-2">
-          {slotsByDate[date].map((s) => (
+          {activeDate?.slots.map((s) => (
             <button
               key={s}
               onClick={() => setSlot(s)}

@@ -1,34 +1,56 @@
+"use client";
+
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { Avatar, Badge, Button, Card, SectionTitle } from "@/components/ui";
-import { atRiskClients, bookings, clientById, reEnrollTargets, trainer } from "@/lib/mock";
+import {
+  atRiskClients,
+  clientById,
+  formatKDate,
+  formatKTime,
+  getBookings,
+  greetingFor,
+  reEnrollTargets,
+  toISODate,
+  trainer,
+} from "@/lib/mock";
+import { useNow } from "@/lib/useNow";
 import { AlertTriangle, CalendarClock, Mic, QrCode, Sparkles, TrendingUp, UserPlus } from "lucide-react";
 
 export default function Dashboard() {
-  const today = bookings.filter((b) => b.date === "2026-06-12");
+  const now = useNow();
+  const todayKey = now ? toISODate(now) : "";
+  const today = now ? getBookings(now).filter((b) => b.date === todayKey) : [];
   const targets = reEnrollTargets();
   const atRisk = atRiskClients();
 
   return (
     <AppShell>
-      {/* 헤더 영역 */}
-      <div className="rounded-b-3xl bg-gradient-to-br from-brand-600 to-brand-700 px-5 pb-6 pt-8 text-white">
-        <p className="text-sm text-brand-100">2026년 6월 12일 금요일</p>
-        <h1 className="mt-1 text-2xl font-extrabold">안녕하세요, {trainer.name} 코치님 👋</h1>
-        <p className="mt-1 text-sm text-brand-100">{trainer.studio}</p>
+      {/* 헤더 영역 — 접속 시점의 실제 날짜/시간 표시 */}
+      <div className="rounded-b-3xl bg-gradient-to-br from-brand-600 via-fuchsia-600 to-pink-600 px-5 pb-6 pt-8 text-white">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-white/80">{now ? formatKDate(now) : " "}</p>
+          <p className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold tabular-nums">
+            {now ? formatKTime(now) : " "}
+          </p>
+        </div>
+        <h1 className="mt-2 text-2xl font-extrabold">
+          {now ? greetingFor(now) : "안녕하세요"}, {trainer.name} {trainer.honorific}님 👋
+        </h1>
+        <p className="mt-1 text-sm text-white/80">{trainer.studio}</p>
 
         <div className="mt-5 grid grid-cols-3 gap-2 text-center">
           <div className="rounded-2xl bg-white/15 py-3">
             <p className="text-xl font-extrabold">{today.length}</p>
-            <p className="text-[11px] text-brand-100">오늘 세션</p>
+            <p className="text-[11px] text-white/80">오늘 세션</p>
           </div>
           <div className="rounded-2xl bg-white/15 py-3">
             <p className="text-xl font-extrabold">{targets.length}</p>
-            <p className="text-[11px] text-brand-100">재등록 대상</p>
+            <p className="text-[11px] text-white/80">재등록 대상</p>
           </div>
           <div className="rounded-2xl bg-white/15 py-3">
             <p className="text-xl font-extrabold">{atRisk.length}</p>
-            <p className="text-[11px] text-brand-100">이탈 위험</p>
+            <p className="text-[11px] text-white/80">이탈 위험</p>
           </div>
         </div>
       </div>
@@ -75,6 +97,10 @@ export default function Dashboard() {
             </div>
           );
         })}
+        {now && today.length === 0 && (
+          <div className="p-5 text-center text-sm text-ink-400">오늘 예약된 세션이 없어요.</div>
+        )}
+        {!now && <div className="p-5 text-center text-sm text-ink-400">불러오는 중…</div>}
       </Card>
 
       {/* 재등록 유도 — 핵심 가치 */}

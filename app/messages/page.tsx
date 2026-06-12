@@ -3,7 +3,8 @@
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Avatar, Badge, Card, SectionTitle } from "@/components/ui";
-import { clientById, messageJobs } from "@/lib/mock";
+import { clientById, getMessageJobs } from "@/lib/mock";
+import { useNow } from "@/lib/useNow";
 import { Cake, CalendarClock, Gift, HeartHandshake, MessageCircle, TrendingUp } from "lucide-react";
 
 const typeMeta: Record<string, { label: string; tone: string; icon: any }> = {
@@ -23,6 +24,8 @@ const triggers = [
 ];
 
 export default function MessagesPage() {
+  const now = useNow();
+  const messageJobs = now ? getMessageJobs(now) : [];
   const [trg, setTrg] = useState(() => Object.fromEntries(triggers.map((t) => [t.key, t.on])));
 
   return (
