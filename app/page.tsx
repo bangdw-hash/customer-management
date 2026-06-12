@@ -28,6 +28,7 @@ export default function Dashboard() {
     <AppShell>
       {/* 헤더 영역 — 접속 시점의 실제 날짜/시간 표시 */}
       <div className="rounded-b-3xl bg-gradient-to-br from-brand-600 via-fuchsia-600 to-pink-600 px-5 pb-6 pt-8 text-white">
+        <p className="mb-2 text-xs font-extrabold tracking-[0.2em] text-white/70">REPEATY</p>
         <div className="flex items-center justify-between">
           <p className="text-sm text-white/80">{now ? formatKDate(now) : " "}</p>
           <p className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold tabular-nums">
