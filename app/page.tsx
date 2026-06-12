@@ -58,13 +58,16 @@ export default function Dashboard() {
       {/* 빠른 작업 */}
       <div className="-mt-4 grid grid-cols-4 gap-2 px-1">
         {[
-          { href: "/reports/new", label: "음성 리포트", icon: Mic, tone: "bg-brand-50 text-brand-600" },
-          { href: "/clients/new", label: "고객 등록", icon: UserPlus, tone: "bg-sky-50 text-sky-600" },
-          { href: "/schedule", label: "예약 링크", icon: QrCode, tone: "bg-violet-50 text-violet-600" },
-          { href: "/clients", label: "고객 현황", icon: TrendingUp, tone: "bg-amber-50 text-amber-600" },
+          { href: "/reports/new", label: "음성 리포트", icon: Mic, tone: "from-violet-500 to-fuchsia-500", glow: "rgba(168,85,247,0.45)" },
+          { href: "/clients/new", label: "고객 등록", icon: UserPlus, tone: "from-sky-500 to-cyan-500", glow: "rgba(14,165,233,0.45)" },
+          { href: "/schedule", label: "예약 링크", icon: QrCode, tone: "from-fuchsia-500 to-pink-500", glow: "rgba(236,72,153,0.45)" },
+          { href: "/clients", label: "고객 현황", icon: TrendingUp, tone: "from-amber-500 to-orange-500", glow: "rgba(245,158,11,0.45)" },
         ].map((q) => (
           <Link key={q.href} href={q.href} className="flex flex-col items-center gap-1.5">
-            <span className={`flex h-14 w-full items-center justify-center rounded-2xl shadow-card ${q.tone}`}>
+            <span
+              className={`flex h-14 w-full items-center justify-center rounded-2xl bg-gradient-to-br text-white ${q.tone}`}
+              style={{ boxShadow: `0 6px 16px -4px ${q.glow}` }}
+            >
               <q.icon size={22} />
             </span>
             <span className="text-[11px] font-semibold text-ink-600">{q.label}</span>
@@ -84,7 +87,7 @@ export default function Dashboard() {
                 <p className="text-[10px] text-ink-400">{b.end}</p>
               </div>
               <div className="h-8 w-px bg-ink-100" />
-              <Avatar name={b.clientName} color={c?.avatarColor ?? "#94a3b8"} size={36} />
+              <Avatar name={b.clientName} gradient={c?.grad} color="#94a3b8" size={36} />
               <div className="flex-1">
                 <p className="text-sm font-semibold text-ink-900">{b.clientName}</p>
                 <p className="text-xs text-ink-400">{c?.goal ?? "신규 예약 요청"}</p>
@@ -109,7 +112,7 @@ export default function Dashboard() {
         {targets.map((c) => (
           <Card key={c.id} className="p-3.5">
             <div className="flex items-center gap-3">
-              <Avatar name={c.name} color={c.avatarColor} />
+              <Avatar name={c.name} gradient={c.grad} />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-bold text-ink-900">{c.name}</p>

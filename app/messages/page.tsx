@@ -74,7 +74,7 @@ export default function MessagesPage() {
           return (
             <Card key={m.id} className="p-3.5">
               <div className="flex items-center gap-3">
-                <Avatar name={m.clientName} color={c?.avatarColor ?? "#94a3b8"} size={36} />
+                <Avatar name={m.clientName} gradient={c?.grad} color="#94a3b8" size={36} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-bold text-ink-900">{m.clientName}</p>

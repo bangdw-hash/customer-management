@@ -69,7 +69,7 @@ export default function ClientsPage() {
           return (
             <Link key={c.id} href={`/clients/${c.id}`}>
               <Card className="flex items-center gap-3 p-3.5">
-                <Avatar name={c.name} color={c.avatarColor} size={44} />
+                <Avatar name={c.name} gradient={c.grad} size={44} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-bold text-ink-900">{c.name}</p>

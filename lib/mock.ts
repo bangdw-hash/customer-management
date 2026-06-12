@@ -27,6 +27,7 @@ export interface Client {
   name: string;
   phone: string;
   avatarColor: string;
+  grad: [string, string]; // 네온 글로우 아바타용 그라데이션 (고객별 상이)
   goal: string;
   status: ClientStatus;
   joinedAt: string;
@@ -67,7 +68,8 @@ export const clients: Client[] = [
     id: "c1",
     name: "김서연",
     phone: "010-2345-6789",
-    avatarColor: color("#10b981"),
+    avatarColor: color("#8b5cf6"),
+    grad: ["#a855f7", "#ec4899"], // 바이올렛 → 핑크
     goal: "체지방 감량 -5kg",
     status: "active",
     joinedAt: "2026-01-10",
@@ -88,6 +90,7 @@ export const clients: Client[] = [
     name: "이준호",
     phone: "010-8765-4321",
     avatarColor: color("#0ea5e9"),
+    grad: ["#06b6d4", "#3b82f6"], // 시안 → 블루
     goal: "근비대 / 벤치 100kg",
     status: "active",
     joinedAt: "2025-11-02",
@@ -108,6 +111,7 @@ export const clients: Client[] = [
     name: "박지민",
     phone: "010-1122-3344",
     avatarColor: color("#f59e0b"),
+    grad: ["#f59e0b", "#f43f5e"], // 앰버 → 로즈
     goal: "체형 교정 / 거북목",
     status: "at-risk",
     joinedAt: "2026-02-20",
@@ -126,7 +130,8 @@ export const clients: Client[] = [
     id: "c4",
     name: "최민재",
     phone: "010-5566-7788",
-    avatarColor: color("#8b5cf6"),
+    avatarColor: color("#10b981"),
+    grad: ["#10b981", "#22d3ee"], // 에메랄드 → 시안
     goal: "다이어트 유지",
     status: "past",
     joinedAt: "2025-06-01",

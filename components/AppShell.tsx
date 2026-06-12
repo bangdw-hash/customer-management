@@ -36,7 +36,7 @@ export default function AppShell({
       {/* 이동 중 핵심 동작: 음성 피드백 빠른 등록 (플로팅 버튼) */}
       <Link
         href="/reports/new"
-        className="fixed bottom-24 left-1/2 z-30 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-brand-600 text-white shadow-float active:bg-brand-700"
+        className="recording fixed bottom-24 left-1/2 z-30 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-pink-500 text-white shadow-[0_8px_24px_-4px_rgba(124,58,237,0.7)] active:opacity-90"
         style={{ marginLeft: 150 }}
         aria-label="음성 피드백 등록"
       >

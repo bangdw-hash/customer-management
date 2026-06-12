@@ -104,7 +104,7 @@ export default function SchedulePage() {
                   <p className="text-sm font-bold text-ink-900">{b.start}</p>
                   <p className="text-[10px] text-ink-400">{b.end}</p>
                 </div>
-                <Avatar name={b.clientName} color={c?.avatarColor ?? "#94a3b8"} size={36} />
+                <Avatar name={b.clientName} gradient={c?.grad} color="#94a3b8" size={36} />
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-ink-900">{b.clientName}</p>
                   <p className="text-xs text-ink-400">{c?.goal ?? "신규 예약 요청"}</p>

@@ -30,7 +30,7 @@ export default function ClientDetail({ params }: { params: { id: string } }) {
       {/* 프로필 */}
       <Card className="p-4">
         <div className="flex items-center gap-3">
-          <Avatar name={c.name} color={c.avatarColor} size={56} />
+          <Avatar name={c.name} gradient={c.grad} size={56} />
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-extrabold text-ink-900">{c.name}</h1>
