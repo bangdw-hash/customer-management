@@ -20,12 +20,12 @@ function toICSDate(date: string, time: string) {
 
 // RFC5545 .ics 문자열 생성 (고객/트레이너 모두 "캘린더에 추가" 가능)
 export function buildICS(ev: CalEvent): string {
-  const uid = `${Date.now()}-${Math.random().toString(36).slice(2)}@fitflow`;
+  const uid = `${Date.now()}-${Math.random().toString(36).slice(2)}@repeaty`;
   const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//FitFlow//PT//KO",
+    "PRODID:-//Repeaty//PT//KO",
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
     `UID:${uid}`,

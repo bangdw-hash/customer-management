@@ -39,12 +39,12 @@ export default function ReviewsPage() {
     apiPost("/api/messages/send", {
       to: phone,
       channel: "kakao_alimtalk",
-      text: `${name}님, ${trainer.name} ${trainer.honorific}입니다 :) 오늘 PT 어떠셨어요? 한 줄 후기 부탁드려요 → https://${trainer.slug}.fitflow.app/review`,
+      text: `${name}님, ${trainer.name} ${trainer.honorific}입니다 :) 오늘 PT 어떠셨어요? 한 줄 후기 부탁드려요 → https://${trainer.slug}.repeaty.app/review`,
     });
   };
 
   const copyLink = () => {
-    navigator.clipboard?.writeText(`https://${trainer.slug}.fitflow.app/review`).catch(() => {});
+    navigator.clipboard?.writeText(`https://${trainer.slug}.repeaty.app/review`).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
@@ -111,7 +111,7 @@ export default function ReviewsPage() {
 
         <div className="mt-3 flex items-center gap-2 rounded-xl border border-ink-200 bg-ink-50 p-2.5">
           <span className="flex-1 truncate text-[11px] text-ink-600">
-            리뷰 작성 링크: {trainer.slug}.fitflow.app/review
+            리뷰 작성 링크: {trainer.slug}.repeaty.app/review
           </span>
           <button onClick={copyLink} className="text-brand-600">
             {copied ? <Check size={16} /> : <Copy size={16} />}

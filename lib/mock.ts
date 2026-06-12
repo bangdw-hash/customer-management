@@ -241,8 +241,8 @@ export const trainer = {
   title: "퍼스널 트레이닝",
   slug: "pro-minji",
   studio: "코어핏 스튜디오 (강남)",
-  bookingUrl: "fitflow.app/book/pro-minji",
-  intakeUrl: "fitflow.app/intake/pro-minji",
+  bookingUrl: "repeaty.app/book/pro-minji",
+  intakeUrl: "repeaty.app/intake/pro-minji",
 };
 
 export const clientById = (id: string) => clients.find((c) => c.id === id);

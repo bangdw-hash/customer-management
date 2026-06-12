@@ -130,7 +130,7 @@ export default function AdminPage() {
         ))}
       </Card>
 
-      <p className="my-6 text-center text-[11px] text-ink-400">핏플로우 v0.1 · 프론트엔드 데모</p>
+      <p className="my-6 text-center text-[11px] text-ink-400">리피티(Repeaty) v0.2 · 트레이너 고객관리</p>
     </AppShell>
   );
 }

@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "핏플로우 — 트레이너 고객관리",
-  description: "헬스 트레이너를 위한 일정·피드백·재등록 관리 도구",
+  title: "리피티(Repeaty) — 트레이너 고객관리",
+  description: "고객이 다시 찾는 이유. 헬스 트레이너를 위한 일정·피드백·재등록 관리 도구",
   manifest: "/manifest.json",
 };
 
