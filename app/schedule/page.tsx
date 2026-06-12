@@ -4,12 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { Avatar, Badge, Button, Card, SectionTitle } from "@/components/ui";
-import { bookings, clientById, trainer } from "@/lib/mock";
+import { clientById, formatKShort, getBookings, toISODate, trainer } from "@/lib/mock";
+import { useNow } from "@/lib/useNow";
 import { CalendarCheck, Check, Copy, ExternalLink, Link2 } from "lucide-react";
 
 const days = ["월", "화", "수", "목", "금", "토", "일"];
 
 export default function SchedulePage() {
+  const now = useNow();
+  const todayBookings = now ? getBookings(now).filter((b) => b.date === toISODate(now)) : [];
   const [copied, setCopied] = useState(false);
   const [avail, setAvail] = useState<Record<string, boolean>>({
     월: true, 화: true, 수: true, 목: true, 금: true, 토: true, 일: false,
@@ -89,10 +92,9 @@ export default function SchedulePage() {
       <p className="mt-1 px-1 text-[11px] text-ink-400">기본 운영 06:00–22:00 · 세션 60분 · 버퍼 15분</p>
 
       {/* 오늘 예약 */}
-      <SectionTitle title="오늘 예약" action="6월 12일" />
+      <SectionTitle title="오늘 예약" action={now ? formatKShort(now) : ""} />
       <div className="space-y-2.5">
-        {bookings
-          .filter((b) => b.date === "2026-06-12")
+        {todayBookings
           .map((b) => {
             const c = b.clientId ? clientById(b.clientId) : undefined;
             const handled = requested.includes(b.id);

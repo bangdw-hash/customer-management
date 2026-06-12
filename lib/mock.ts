@@ -143,12 +143,58 @@ export const clients: Client[] = [
   },
 ];
 
-export const bookings: Booking[] = [
-  { id: "b1", clientId: "c2", clientName: "이준호", date: "2026-06-12", start: "07:00", end: "08:00", status: "confirmed" },
-  { id: "b2", clientId: "c1", clientName: "김서연", date: "2026-06-12", start: "10:00", end: "11:00", status: "confirmed" },
-  { id: "b3", clientName: "신규(예약요청)", date: "2026-06-12", start: "19:00", end: "20:00", status: "requested" },
-  { id: "b4", clientId: "c2", clientName: "이준호", date: "2026-06-13", start: "07:00", end: "08:00", status: "confirmed" },
+// ===== 현재 날짜/시간 유틸 (접속 시점 기준으로 동작) =====
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const pad = (n: number) => String(n).padStart(2, "0");
+
+export const toISODate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+export const addDays = (d: Date, n: number) => {
+  const x = new Date(d);
+  x.setDate(x.getDate() + n);
+  return x;
+};
+export const formatKDate = (d: Date) =>
+  `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${WEEKDAYS[d.getDay()]}요일`;
+export const formatKShort = (d: Date) => `${d.getMonth() + 1}월 ${d.getDate()}일`;
+export const formatKTime = (d: Date) => {
+  const h = d.getHours();
+  const ampm = h < 12 ? "오전" : "오후";
+  const hh = h % 12 === 0 ? 12 : h % 12;
+  return `${ampm} ${hh}:${pad(d.getMinutes())}`;
+};
+export const greetingFor = (d: Date) => {
+  const h = d.getHours();
+  if (h < 6) return "늦은 시간이네요";
+  if (h < 12) return "좋은 아침이에요";
+  if (h < 18) return "좋은 오후예요";
+  return "좋은 저녁이에요";
+};
+
+// 접속한 "오늘"을 기준으로 오늘/내일 예약을 생성
+export function getBookings(now: Date): Booking[] {
+  const today = toISODate(now);
+  const tomorrow = toISODate(addDays(now, 1));
+  return [
+    { id: "b1", clientId: "c2", clientName: "이준호", date: today, start: "07:00", end: "08:00", status: "confirmed" },
+    { id: "b2", clientId: "c1", clientName: "김서연", date: today, start: "10:00", end: "11:00", status: "confirmed" },
+    { id: "b3", clientName: "신규(예약요청)", date: today, start: "19:00", end: "20:00", status: "requested" },
+    { id: "b4", clientId: "c2", clientName: "이준호", date: tomorrow, start: "07:00", end: "08:00", status: "confirmed" },
+  ];
+}
+
+// 고객 예약 화면에 노출할 날짜(오늘부터 며칠) + 가능 슬롯
+const SLOT_SETS = [
+  ["13:00", "14:00", "16:00", "20:00", "21:00"],
+  ["09:00", "11:00", "15:00", "17:00"],
+  ["07:00", "10:00", "12:00", "18:00", "19:00"],
+  ["08:00", "13:00", "14:00", "20:00"],
 ];
+export function getBookingDates(now: Date) {
+  return [0, 1, 3, 4].map((off, i) => {
+    const d = addDays(now, off);
+    return { key: toISODate(d), label: `${d.getMonth() + 1}/${d.getDate()}`, day: WEEKDAYS[d.getDay()], slots: SLOT_SETS[i] };
+  });
+}
 
 export const reports: Report[] = [
   {
@@ -173,20 +219,25 @@ export const reports: Report[] = [
   },
 ];
 
-export const messageJobs: MessageJob[] = [
-  { id: "m1", clientId: "c3", clientName: "박지민", channel: "kakao", type: "reengage", scheduledAt: "2026-06-13 09:00", status: "scheduled", preview: "지민님, 요즘 야근으로 바쁘시죠? 컨디션 어떠세요? 10분 스트레칭 루틴 보내드려요 :)" },
-  { id: "m2", clientId: "c3", clientName: "박지민", channel: "kakao", type: "birthday", scheduledAt: "2026-06-14 10:00", status: "scheduled", preview: "지민님 생일 축하드려요! 🎂 건강한 한 해 함께 만들어가요." },
-  { id: "m3", clientId: "c1", clientName: "김서연", channel: "kakao", type: "birthday", scheduledAt: "2026-06-18 10:00", status: "scheduled", preview: "서연님 생일 축하드려요! 🎂" },
-  { id: "m4", clientId: "c1", clientName: "김서연", channel: "kakao", type: "reminder", scheduledAt: "2026-06-12 08:00", status: "sent", preview: "오늘 10:00 PT 예약 알림이에요. 컨디션 체크하고 뵐게요!" },
-];
+// 접속한 "오늘"을 기준으로 예약 발송 메시지를 생성
+export function getMessageJobs(now: Date): MessageJob[] {
+  const at = (off: number, hm: string) => `${toISODate(addDays(now, off))} ${hm}`;
+  return [
+    { id: "m1", clientId: "c3", clientName: "박지민", channel: "kakao", type: "reengage", scheduledAt: at(1, "09:00"), status: "scheduled", preview: "지민님, 요즘 야근으로 바쁘시죠? 컨디션 어떠세요? 10분 스트레칭 루틴 보내드려요 :)" },
+    { id: "m2", clientId: "c3", clientName: "박지민", channel: "kakao", type: "birthday", scheduledAt: at(2, "10:00"), status: "scheduled", preview: "지민님 생일 축하드려요! 🎂 건강한 한 해 함께 만들어가요." },
+    { id: "m3", clientId: "c1", clientName: "김서연", channel: "kakao", type: "birthday", scheduledAt: at(6, "10:00"), status: "scheduled", preview: "서연님 생일 축하드려요! 🎂" },
+    { id: "m4", clientId: "c1", clientName: "김서연", channel: "kakao", type: "reminder", scheduledAt: at(0, "08:00"), status: "sent", preview: "오늘 10:00 PT 예약 알림이에요. 컨디션 체크하고 뵐게요!" },
+  ];
+}
 
 export const trainer = {
-  name: "강도현",
+  name: "김민지",
+  honorific: "프로", // "프로님"으로 호칭
   title: "퍼스널 트레이닝",
-  slug: "coach-dohyun",
+  slug: "pro-minji",
   studio: "코어핏 스튜디오 (강남)",
-  bookingUrl: "fitflow.app/book/coach-dohyun",
-  intakeUrl: "fitflow.app/intake/coach-dohyun",
+  bookingUrl: "fitflow.app/book/pro-minji",
+  intakeUrl: "fitflow.app/intake/pro-minji",
 };
 
 export const clientById = (id: string) => clients.find((c) => c.id === id);
