@@ -95,7 +95,7 @@ export default function NewReport() {
                   clientId === c.id ? "bg-brand-50" : ""
                 }`}
               >
-                <Avatar name={c.name} color={c.avatarColor} size={40} />
+                <Avatar name={c.name} gradient={c.grad} size={40} />
                 <div className="flex-1 text-left">
                   <p className="text-sm font-semibold text-ink-900">{c.name}</p>
                   <p className="text-xs text-ink-400">{c.goal}</p>
@@ -114,7 +114,7 @@ export default function NewReport() {
       {step === "record" && (
         <div className="flex flex-col items-center pt-6">
           <div className="flex items-center gap-2">
-            <Avatar name={client.name} color={client.avatarColor} size={32} />
+            <Avatar name={client.name} gradient={client.grad} size={32} />
             <p className="text-sm font-bold text-ink-900">{client.name}님 세션 피드백</p>
           </div>
           <p className="mb-8 mt-1 text-xs text-ink-400">자유롭게 말하면 AI가 리포트로 정리해요</p>

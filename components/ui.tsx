@@ -64,11 +64,31 @@ export function Badge({
   );
 }
 
-export function Avatar({ name, color, size = 40 }: { name: string; color: string; size?: number }) {
+export function Avatar({
+  name,
+  color,
+  gradient,
+  size = 40,
+}: {
+  name: string;
+  color?: string;
+  gradient?: [string, string];
+  size?: number;
+}) {
+  const bg = gradient
+    ? `linear-gradient(135deg, ${gradient[0]}, ${gradient[1]})`
+    : color ?? "#94a3b8";
+  const glow = gradient ? gradient[1] : color ?? "#94a3b8";
   return (
     <div
       className="flex shrink-0 items-center justify-center rounded-full font-bold text-white"
-      style={{ background: color, width: size, height: size, fontSize: size * 0.4 }}
+      style={{
+        background: bg,
+        width: size,
+        height: size,
+        fontSize: size * 0.4,
+        boxShadow: `0 6px 16px -4px ${glow}80`,
+      }}
     >
       {name.slice(0, 1)}
     </div>
@@ -84,7 +104,8 @@ export function Button({
   variant?: "primary" | "ghost" | "outline" | "danger";
 }) {
   const styles = {
-    primary: "bg-brand-600 text-white active:bg-brand-700",
+    primary:
+      "bg-gradient-to-r from-brand-600 to-pink-500 text-white shadow-[0_6px_18px_-6px_rgba(124,58,237,0.6)] active:opacity-90",
     ghost: "bg-ink-100 text-ink-700 active:bg-ink-200",
     outline: "border border-ink-200 bg-white text-ink-700 active:bg-ink-50",
     danger: "bg-rose-500 text-white active:bg-rose-600",
