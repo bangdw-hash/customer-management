@@ -47,15 +47,15 @@ export default function AppShell({
   }, [pathname]);
 
   return (
-    <div className="phone-frame pb-24">
+    <div className="phone-frame pb-28">
       {title && (
         <header className="sticky top-0 z-20 border-b border-ink-100 bg-white/90 px-5 py-4 backdrop-blur">
           <h1 className="text-lg font-extrabold tracking-tight text-ink-900">{title}</h1>
-          {subtitle && <p className="text-xs text-ink-400">{subtitle}</p>}
+          {subtitle && <p className="mt-0.5 text-xs text-ink-400">{subtitle}</p>}
         </header>
       )}
 
-      <main className="px-4">{children}</main>
+      <main className="px-4 pb-2">{children}</main>
 
       {/* 이동 중 핵심 동작: 음성 피드백 빠른 등록 (플로팅 버튼) */}
       <Link
