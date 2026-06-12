@@ -279,3 +279,50 @@ export async function resetData(): Promise<void> {
   await db.delete(schema.reviews);
   await db.delete(schema.clients);
 }
+
+// ===== 트레이너 프로필 (이름/호칭/지점) =====
+import { trainer as mockTrainer } from "@/lib/mock";
+
+export type TrainerProfile = { name: string; honorific: string; studio: string; slug: string };
+
+export async function getTrainer(): Promise<TrainerProfile> {
+  const fallback: TrainerProfile = {
+    name: mockTrainer.name,
+    honorific: mockTrainer.honorific,
+    studio: mockTrainer.studio,
+    slug: mockTrainer.slug,
+  };
+  const db = getDb();
+  if (!db) return fallback;
+  const rows = await db.select().from(schema.trainers).where(eq(schema.trainers.id, "t_default"));
+  const r = rows[0];
+  if (!r) return fallback;
+  return { name: r.name, honorific: r.honorific, studio: r.studio ?? "", slug: r.slug };
+}
+
+export async function updateTrainer(input: Partial<TrainerProfile>): Promise<TrainerProfile> {
+  const db = getDb();
+  if (!db) {
+    Object.assign(mockTrainer, input);
+    return getTrainer();
+  }
+  const existing = await db.select().from(schema.trainers).where(eq(schema.trainers.id, "t_default"));
+  const set = {
+    ...(input.name !== undefined ? { name: input.name } : {}),
+    ...(input.honorific !== undefined ? { honorific: input.honorific } : {}),
+    ...(input.studio !== undefined ? { studio: input.studio } : {}),
+    ...(input.slug !== undefined ? { slug: input.slug } : {}),
+  };
+  if (existing[0]) {
+    await db.update(schema.trainers).set(set).where(eq(schema.trainers.id, "t_default"));
+  } else {
+    await db.insert(schema.trainers).values({
+      id: "t_default",
+      name: input.name ?? mockTrainer.name,
+      honorific: input.honorific ?? mockTrainer.honorific,
+      studio: input.studio ?? mockTrainer.studio,
+      slug: input.slug ?? mockTrainer.slug,
+    });
+  }
+  return getTrainer();
+}

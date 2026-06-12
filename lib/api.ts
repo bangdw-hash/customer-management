@@ -24,3 +24,16 @@ export async function apiPost<T = any>(url: string, body: unknown): Promise<T | 
     return null;
   }
 }
+
+export async function apiPut<T = any>(url: string, body: unknown): Promise<T | null> {
+  try {
+    const r = await fetch(url, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return (await r.json().catch(() => ({}))) as T;
+  } catch {
+    return null;
+  }
+}

@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { Button, Card } from "@/components/ui";
-import { trainer } from "@/lib/mock";
+import { useTrainer } from "@/lib/useTrainer";
 import { Check, ShieldCheck } from "lucide-react";
 
 export default function IntakePage() {
+  const t = useTrainer();
   const [done, setDone] = useState(false);
   const [agree, setAgree] = useState(false);
 
@@ -17,7 +18,7 @@ export default function IntakePage() {
         </div>
         <h1 className="mt-5 text-xl font-extrabold text-ink-900">등록 완료!</h1>
         <p className="mt-2 text-sm text-ink-500">
-          {trainer.name} {trainer.honorific}님에게 정보가 전달되었어요.
+          {t.name} {t.honorific}님에게 정보가 전달되었어요.
           <br />곧 연락드릴게요 😊
         </p>
       </div>
@@ -28,8 +29,8 @@ export default function IntakePage() {
     <div className="phone-frame min-h-[100dvh] pb-10">
       <div className="bg-gradient-to-br from-brand-600 via-fuchsia-600 to-pink-600 px-6 pb-6 pt-10 text-white">
         <p className="text-xs text-white/80">고객 정보 입력</p>
-        <h1 className="mt-1 text-xl font-extrabold">{trainer.name} {trainer.honorific}님과 함께 시작해요</h1>
-        <p className="mt-1 text-sm text-white/80">{trainer.studio}</p>
+        <h1 className="mt-1 text-xl font-extrabold">{t.name} {t.honorific}님과 함께 시작해요</h1>
+        <p className="mt-1 text-sm text-white/80">{t.studio}</p>
       </div>
 
       <div className="px-5 pt-5">
