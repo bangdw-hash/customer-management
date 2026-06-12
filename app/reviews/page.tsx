@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { Avatar, Badge, Button, Card, SectionTitle } from "@/components/ui";
-import { clientById, marketingReviews, reviewRequestTargets, reviews, trainer } from "@/lib/mock";
+import { clientById, reviewRequestTargets, reviews, trainer, type Review } from "@/lib/mock";
+import { apiGet, apiPost } from "@/lib/api";
 import { Check, Copy, Download, Send, Share2, Sparkles, Star } from "lucide-react";
 
 function Stars({ n }: { n: number }) {
@@ -20,9 +21,27 @@ function Stars({ n }: { n: number }) {
 export default function ReviewsPage() {
   const [requested, setRequested] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
-  const marketing = marketingReviews();
+  const [revs, setRevs] = useState<Review[]>(reviews);
+
+  useEffect(() => {
+    apiGet<{ reviews: Review[] }>("/api/reviews").then((d) => {
+      if (d?.reviews?.length) setRevs(d.reviews);
+    });
+  }, []);
+
+  const marketing = revs.filter((r) => r.consentMarketing);
   const targets = reviewRequestTargets();
-  const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+  const avg = revs.length ? (revs.reduce((s, r) => s + r.rating, 0) / revs.length).toFixed(1) : "0.0";
+
+  const requestReview = (clientId: string, name: string, phone: string) => {
+    setRequested((r) => [...r, clientId]);
+    // 리뷰 작성 링크를 메시지로 발송(키 있으면 실제, 없으면 시뮬레이션)
+    apiPost("/api/messages/send", {
+      to: phone,
+      channel: "kakao_alimtalk",
+      text: `${name}님, ${trainer.name} ${trainer.honorific}입니다 :) 오늘 PT 어떠셨어요? 한 줄 후기 부탁드려요 → https://${trainer.slug}.fitflow.app/review`,
+    });
+  };
 
   const copyLink = () => {
     navigator.clipboard?.writeText(`https://${trainer.slug}.fitflow.app/review`).catch(() => {});
@@ -41,7 +60,7 @@ export default function ReviewsPage() {
           <p className="text-[10px] text-ink-400">평균 별점</p>
         </Card>
         <Card className="p-3 text-center">
-          <p className="text-xl font-extrabold text-ink-900">{reviews.length}</p>
+          <p className="text-xl font-extrabold text-ink-900">{revs.length}</p>
           <p className="text-[10px] text-ink-400">받은 후기</p>
         </Card>
         <Card className="p-3 text-center">
@@ -73,7 +92,7 @@ export default function ReviewsPage() {
                 <Button
                   variant={done ? "outline" : "primary"}
                   className="px-3 py-1.5 text-xs"
-                  onClick={() => setRequested((r) => [...r, c.id])}
+                  onClick={() => requestReview(c.id, c.name, c.phone)}
                   disabled={done}
                 >
                   {done ? (

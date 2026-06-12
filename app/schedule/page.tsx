@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { Avatar, Badge, Button, Card, SectionTitle } from "@/components/ui";
 import { clientById, formatKShort, getBookings, toISODate, trainer } from "@/lib/mock";
+import { apiPost } from "@/lib/api";
 import { useNow } from "@/lib/useNow";
 import { CalendarCheck, Check, Copy, ExternalLink, Link2 } from "lucide-react";
 
@@ -112,7 +113,22 @@ export default function SchedulePage() {
                 {b.status === "requested" && !handled ? (
                   <Button
                     className="px-3 py-1.5 text-xs"
-                    onClick={() => setRequested((r) => [...r, b.id])}
+                    onClick={() => {
+                      setRequested((r) => [...r, b.id]);
+                      // 확정 → 구글캘린더(.ics) 등록 + 고객 확인 메시지
+                      apiPost("/api/calendar/event", {
+                        title: `PT — ${b.clientName}`,
+                        date: b.date,
+                        start: b.start,
+                        end: b.end,
+                        location: trainer.studio,
+                      });
+                      apiPost("/api/messages/send", {
+                        to: c?.phone ?? b.clientName,
+                        channel: "kakao_alimtalk",
+                        text: `${b.clientName}님, 예약이 확정됐어요! ${b.date} ${b.start} 뵐게요 :)`,
+                      });
+                    }}
                   >
                     승인
                   </Button>

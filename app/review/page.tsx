@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button, Card } from "@/components/ui";
 import { trainer } from "@/lib/mock";
+import { apiPost } from "@/lib/api";
 import { Camera, Check, Heart, Star } from "lucide-react";
 
 const QUICK = ["친절해요", "성과가 좋아요", "꼼꼼해요", "동기부여 최고", "시설이 좋아요"];
@@ -13,6 +14,12 @@ export default function ReviewPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [consent, setConsent] = useState(true);
   const [done, setDone] = useState(false);
+
+  const submit = () => {
+    const body = text || (tags.length ? tags.join(", ") : "");
+    apiPost("/api/reviews", { rating, text: body, consentMarketing: consent });
+    setDone(true);
+  };
 
   if (done) {
     return (
@@ -108,7 +115,7 @@ export default function ReviewPage() {
       </div>
 
       <div className="fixed bottom-0 left-1/2 w-full max-w-[460px] -translate-x-1/2 border-t border-ink-100 bg-white/95 p-4 backdrop-blur">
-        <Button className="w-full disabled:opacity-40" disabled={rating === 0} onClick={() => setDone(true)}>
+        <Button className="w-full disabled:opacity-40" disabled={rating === 0} onClick={submit}>
           후기 보내기
         </Button>
       </div>

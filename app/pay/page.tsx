@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { Button, Card } from "@/components/ui";
 import { KRW, trainer } from "@/lib/mock";
+import { apiPost } from "@/lib/api";
 import { BadgeCheck, Check, ShieldCheck } from "lucide-react";
+
+// 데모 결제 id (실제로는 링크 파라미터로 전달)
+const DEMO_PAYMENT_ID = "p3";
 
 // 데모용 확인 대상 결제 (실제로는 링크 파라미터로 특정 결제 전달)
 const demo = {
@@ -58,7 +62,13 @@ export default function PayConfirmPage() {
             <p className="text-xs text-ink-500">잔여 세션에 {demo.sessionsAdded}회가 반영됐어요.</p>
           </Card>
         ) : (
-          <Button className="mt-5 w-full" onClick={() => setDone(true)}>
+          <Button
+            className="mt-5 w-full"
+            onClick={() => {
+              apiPost("/api/payments/confirm", { id: DEMO_PAYMENT_ID });
+              setDone(true);
+            }}
+          >
             <Check size={18} /> 내역 확인
           </Button>
         )}
