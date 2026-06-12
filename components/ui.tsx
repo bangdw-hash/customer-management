@@ -68,11 +68,13 @@ export function Avatar({
   name,
   color,
   gradient,
+  image,
   size = 40,
 }: {
   name: string;
   color?: string;
   gradient?: [string, string];
+  image?: string;
   size?: number;
 }) {
   const bg = gradient
@@ -81,7 +83,7 @@ export function Avatar({
   const glow = gradient ? gradient[1] : color ?? "#94a3b8";
   return (
     <div
-      className="flex shrink-0 items-center justify-center rounded-full font-bold text-white"
+      className="flex shrink-0 items-center justify-center overflow-hidden rounded-full font-bold text-white"
       style={{
         background: bg,
         width: size,
@@ -90,7 +92,12 @@ export function Avatar({
         boxShadow: `0 6px 16px -4px ${glow}80`,
       }}
     >
-      {name.slice(0, 1)}
+      {image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={image} alt={name} className="h-full w-full object-cover" />
+      ) : (
+        name.slice(0, 1)
+      )}
     </div>
   );
 }

@@ -15,7 +15,7 @@ export default function NewClient() {
   const [method, setMethod] = useState<Method>("qr");
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState({ name: "", phone: "", goal: "" });
+  const [form, setForm] = useState({ name: "", phone: "", goal: "", photoUrl: "" });
 
   const saveClient = () => {
     // 낙관적 UI + 백그라운드 저장(DB 연결 시 영속)
@@ -23,7 +23,7 @@ export default function NewClient() {
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
-      setForm({ name: "", phone: "", goal: "" });
+      setForm({ name: "", phone: "", goal: "", photoUrl: "" });
     }, 1500);
   };
 
@@ -102,6 +102,12 @@ export default function NewClient() {
         {method === "manual" && (
           <Card className="space-y-3 p-5">
             <p className="text-sm font-bold text-ink-900">직접 입력</p>
+            <div>
+              <label className="text-xs font-semibold text-ink-500">프로필 사진 (선택)</label>
+              <div className="mt-1">
+                <PhotoCapture label="고객 사진 촬영 / 업로드" onUploaded={(u) => setForm((f) => ({ ...f, photoUrl: u }))} />
+              </div>
+            </div>
             <div>
               <label className="text-xs font-semibold text-ink-500">이름</label>
               <input

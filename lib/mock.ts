@@ -28,6 +28,7 @@ export interface Client {
   phone: string;
   avatarColor: string;
   grad: [string, string]; // 네온 글로우 아바타용 그라데이션 (고객별 상이)
+  photoUrl?: string; // 프로필/명함 사진 (Vercel Blob URL)
   goal: string;
   status: ClientStatus;
   joinedAt: string;
@@ -286,6 +287,7 @@ export interface Review {
   date: string;
   consentMarketing: boolean; // 홍보 사용 동의
   beforeAfter?: boolean; // 비포/애프터 첨부 여부
+  photoUrl?: string; // 첨부 사진 (Vercel Blob URL)
 }
 
 export const reviews: Review[] = [

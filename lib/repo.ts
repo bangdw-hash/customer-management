@@ -22,6 +22,7 @@ function rowToClient(r: typeof schema.clients.$inferSelect): Client {
     phone: r.phone ?? "",
     avatarColor: r.gradFrom,
     grad: [r.gradFrom, r.gradTo],
+    photoUrl: r.photoUrl ?? undefined,
     goal: r.goal ?? "",
     status: (r.status as Client["status"]) ?? "active",
     joinedAt: r.joinedAt ?? "",
@@ -60,6 +61,7 @@ export async function createClient(input: Partial<Client> & { name: string }): P
       phone: input.phone ?? "",
       avatarColor: grad[0],
       grad,
+      photoUrl: input.photoUrl,
       goal: input.goal ?? "",
       status: "active",
       joinedAt: new Date().toISOString().slice(0, 10),
@@ -78,6 +80,7 @@ export async function createClient(input: Partial<Client> & { name: string }): P
     phone: input.phone,
     gradFrom: grad[0],
     gradTo: grad[1],
+    photoUrl: input.photoUrl,
     goal: input.goal,
     status: "active",
     joinedAt: new Date().toISOString().slice(0, 10),
@@ -150,6 +153,7 @@ export async function listReviews(): Promise<Review[]> {
     date: r.date,
     consentMarketing: r.consentMarketing,
     beforeAfter: r.beforeAfter,
+    photoUrl: r.photoUrl ?? undefined,
   }));
 }
 
@@ -169,6 +173,7 @@ export async function addReview(input: Omit<Review, "id">): Promise<Review> {
     date: input.date,
     consentMarketing: input.consentMarketing,
     beforeAfter: input.beforeAfter ?? false,
+    photoUrl: input.photoUrl,
   });
   return rv;
 }
