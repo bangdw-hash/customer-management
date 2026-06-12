@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button, Card } from "@/components/ui";
 import { apiGet, apiPost } from "@/lib/api";
-import { Check, Database, KeyRound, Loader2, X } from "lucide-react";
+import { Check, Database, KeyRound, Loader2, MessageSquare, Send, X } from "lucide-react";
 
 type Status = { db: boolean; ai: boolean; message: boolean; calendar: boolean };
 
@@ -12,6 +12,12 @@ export default function SetupPage() {
   const [status, setStatus] = useState<Status | null>(null);
   const [busy, setBusy] = useState<"" | "migrate" | "seed">("");
   const [log, setLog] = useState<string[]>([]);
+
+  // 테스트 문자 발송
+  const [testPhone, setTestPhone] = useState("");
+  const [testMsg, setTestMsg] = useState("[리피티] 테스트 문자입니다. 정상 수신되면 발송 설정 완료!");
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<string>("");
 
   const refresh = () => apiGet<Status>("/api/status").then((s) => s && setStatus(s));
   useEffect(() => { refresh(); }, []);
@@ -27,6 +33,21 @@ export default function SetupPage() {
     if (res?.ok) addLog(kind === "migrate" ? "✅ 테이블 생성 완료" : "✅ 샘플 데이터 주입 완료");
     else addLog(`❌ 실패: ${res?.error ?? "알 수 없는 오류"}`);
     refresh();
+  };
+
+  const sendTest = async () => {
+    if (!testPhone) return setTestResult("⚠️ 받는 번호를 입력하세요.");
+    setTesting(true);
+    setTestResult("");
+    const res = await apiPost<any>("/api/messages/send", { to: testPhone, channel: "sms", text: testMsg });
+    setTesting(false);
+    if (res?.ok && res?.simulated) {
+      setTestResult("🟡 시뮬레이션됨 — 아직 Solapi 키가 없어요. (SOLAPI_* 환경변수 등록 후 Redeploy 필요)");
+    } else if (res?.ok) {
+      setTestResult(`✅ 발송 성공! (${res?.provider ?? "provider"}) — 휴대폰을 확인하세요.`);
+    } else {
+      setTestResult(`❌ 실패: ${res?.error ?? "알 수 없는 오류"}`);
+    }
   };
 
   const Dot = ({ on }: { on: boolean }) =>
@@ -104,6 +125,34 @@ export default function SetupPage() {
           </div>
         </Card>
       )}
+
+      {/* 테스트 문자 발송 (SMS 검증) */}
+      <Card className="mt-4 p-4">
+        <div className="mb-2 flex items-center gap-1.5">
+          <MessageSquare size={15} className="text-ink-600" />
+          <p className="text-sm font-bold text-ink-900">테스트 문자 발송</p>
+        </div>
+        <p className="mb-3 text-[11px] text-ink-400">
+          Solapi 키를 넣고 Redeploy 한 뒤, 내 번호로 보내 정상 수신되는지 확인하세요.
+        </p>
+        <input
+          value={testPhone}
+          onChange={(e) => setTestPhone(e.target.value)}
+          placeholder="받는 번호 (예: 01012345678)"
+          inputMode="numeric"
+          className="w-full rounded-xl border border-ink-200 p-3 text-sm outline-none focus:border-brand-400"
+        />
+        <textarea
+          value={testMsg}
+          onChange={(e) => setTestMsg(e.target.value)}
+          rows={2}
+          className="mt-2 w-full rounded-xl border border-ink-200 p-3 text-sm outline-none focus:border-brand-400"
+        />
+        <Button className="mt-2 w-full" onClick={sendTest} disabled={testing}>
+          {testing ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} 테스트 발송
+        </Button>
+        {testResult && <p className="mt-2 text-center text-xs font-medium text-ink-700">{testResult}</p>}
+      </Card>
 
       <p className="mt-4 text-center text-[11px] text-ink-400">
         설정 완료 후에는 이 페이지를 사용할 필요가 없어요.
