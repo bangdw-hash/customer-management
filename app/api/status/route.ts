@@ -7,7 +7,7 @@ export async function GET() {
   return Response.json({
     db: hasDb,
     ai: !!process.env.ANTHROPIC_API_KEY,
-    message: !!process.env.MESSAGE_WEBHOOK_URL,
+    message: !!(process.env.SOLAPI_API_KEY || process.env.MESSAGE_WEBHOOK_URL),
     calendar: !!process.env.CALENDAR_WEBHOOK_URL,
   });
 }
