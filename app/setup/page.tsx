@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button, Card } from "@/components/ui";
 import { apiGet, apiPost } from "@/lib/api";
-import { Check, Database, KeyRound, Loader2, MessageSquare, Send, X } from "lucide-react";
+import { Check, Database, KeyRound, Loader2, MessageSquare, Send, Trash2, X } from "lucide-react";
 
 type Status = { db: boolean; ai: boolean; message: boolean; calendar: boolean };
 
@@ -48,6 +48,14 @@ export default function SetupPage() {
     } else {
       setTestResult(`❌ 실패: ${res?.error ?? "알 수 없는 오류"}`);
     }
+  };
+
+  const resetAll = async () => {
+    if (!token) return addLog("⚠️ SEED_TOKEN 을 먼저 입력하세요.");
+    if (typeof window !== "undefined" && !window.confirm("모든 고객·결제·리뷰·리포트를 삭제할까요? (되돌릴 수 없어요)")) return;
+    const res = await apiPost<any>(`/api/reset?token=${encodeURIComponent(token)}`, {});
+    if (res?.ok) addLog("🧹 전체 데이터 비움 완료");
+    else addLog(`❌ 초기화 실패: ${res?.error ?? "알 수 없는 오류"}`);
   };
 
   const Dot = ({ on }: { on: boolean }) =>
@@ -152,6 +160,17 @@ export default function SetupPage() {
           {testing ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} 테스트 발송
         </Button>
         {testResult && <p className="mt-2 text-center text-xs font-medium text-ink-700">{testResult}</p>}
+      </Card>
+
+      {/* 데이터 초기화 */}
+      <Card className="mt-4 border border-rose-100 p-4">
+        <p className="text-sm font-bold text-ink-900">데이터 초기화</p>
+        <p className="mb-3 text-[11px] text-ink-400">
+          샘플 고객을 포함한 <b>모든 고객·결제·리뷰·리포트</b>를 삭제합니다. 깨끗한 상태로 베타테스트할 때 사용하세요.
+        </p>
+        <Button variant="danger" className="w-full" onClick={resetAll} disabled={!status?.db}>
+          <Trash2 size={16} /> 전체 데이터 비우기
+        </Button>
       </Card>
 
       <p className="mt-4 text-center text-[11px] text-ink-400">

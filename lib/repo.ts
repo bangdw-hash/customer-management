@@ -242,3 +242,40 @@ export async function addReport(input: Omit<Report, "id">): Promise<Report> {
   });
   return r;
 }
+
+// ===== 삭제 / 초기화 =====
+export async function deleteClient(id: string): Promise<void> {
+  const db = getDb();
+  if (!db) {
+    const ci = mockClients.findIndex((c) => c.id === id);
+    if (ci >= 0) mockClients.splice(ci, 1);
+    for (let i = mockPayments.length - 1; i >= 0; i--) if (mockPayments[i].clientId === id) mockPayments.splice(i, 1);
+    for (let i = mockReviews.length - 1; i >= 0; i--) if (mockReviews[i].clientId === id) mockReviews.splice(i, 1);
+    for (let i = mockReports.length - 1; i >= 0; i--) if (mockReports[i].clientId === id) mockReports.splice(i, 1);
+    return;
+  }
+  await db.delete(schema.measurements).where(eq(schema.measurements.clientId, id));
+  await db.delete(schema.reports).where(eq(schema.reports.clientId, id));
+  await db.delete(schema.payments).where(eq(schema.payments.clientId, id));
+  await db.delete(schema.reviews).where(eq(schema.reviews.clientId, id));
+  await db.delete(schema.bookings).where(eq(schema.bookings.clientId, id));
+  await db.delete(schema.clients).where(eq(schema.clients.id, id));
+}
+
+// 모든 고객/관련 데이터 비우기 (트레이너·설정은 유지)
+export async function resetData(): Promise<void> {
+  const db = getDb();
+  if (!db) {
+    mockClients.length = 0;
+    mockPayments.length = 0;
+    mockReviews.length = 0;
+    mockReports.length = 0;
+    return;
+  }
+  await db.delete(schema.measurements);
+  await db.delete(schema.bookings);
+  await db.delete(schema.reports);
+  await db.delete(schema.payments);
+  await db.delete(schema.reviews);
+  await db.delete(schema.clients);
+}

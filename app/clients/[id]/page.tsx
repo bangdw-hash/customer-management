@@ -3,20 +3,23 @@ import { notFound } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { Avatar, Badge, Button, Card, SectionTitle } from "@/components/ui";
 import { clientById, reportsByClient } from "@/lib/mock";
+import { getClient } from "@/lib/repo";
+import DeleteClientButton from "@/components/DeleteClientButton";
 import { ArrowLeft, Cake, Gift, Mic, Phone, Send, Sparkles } from "lucide-react";
 
-export default function ClientDetail({ params }: { params: { id: string } }) {
-  const c = clientById(params.id);
+export default async function ClientDetail({ params }: { params: { id: string } }) {
+  // 데모 고객(c1~)은 풍부한 목업, 새로 등록한 고객은 DB에서 조회
+  const c = clientById(params.id) ?? (await getClient(params.id));
   if (!c) return notFound();
   const reports = reportsByClient(c.id);
 
+  const hasMeasure = c.measurements.length > 0;
   const first = c.measurements[0];
   const last = c.measurements[c.measurements.length - 1];
-  const dWeight = (last.weight - first.weight).toFixed(1);
-  const dFat = (last.bodyFat - first.bodyFat).toFixed(1);
-  const dMuscle = (last.muscle - first.muscle).toFixed(1);
-
-  const maxW = Math.max(...c.measurements.map((m) => m.weight));
+  const dWeight = hasMeasure ? (last.weight - first.weight).toFixed(1) : "0";
+  const dFat = hasMeasure ? (last.bodyFat - first.bodyFat).toFixed(1) : "0";
+  const dMuscle = hasMeasure ? (last.muscle - first.muscle).toFixed(1) : "0";
+  const maxW = hasMeasure ? Math.max(...c.measurements.map((m) => m.weight)) : 1;
 
   return (
     <AppShell>
@@ -84,7 +87,9 @@ export default function ClientDetail({ params }: { params: { id: string } }) {
         </div>
       </Card>
 
-      {/* 성과(비포/애프터) */}
+      {/* 성과(비포/애프터) — 측정 기록이 있을 때만 */}
+      {hasMeasure && (
+      <>
       <SectionTitle title="성과 변화" action={`${first.date} → ${last.date}`} />
       <Card className="p-4">
         <div className="mb-4 grid grid-cols-3 gap-2 text-center">
@@ -109,6 +114,8 @@ export default function ClientDetail({ params }: { params: { id: string } }) {
           <Send size={16} /> 비포/애프터 카드 공유하기
         </Button>
       </Card>
+      </>
+      )}
 
       {/* 리포트 타임라인 */}
       <SectionTitle title="리포트 타임라인" action="음성으로 작성" href="/reports/new" />
@@ -147,6 +154,8 @@ export default function ClientDetail({ params }: { params: { id: string } }) {
           <Sparkles size={16} /> 재등록 제안
         </Button>
       </div>
+
+      <DeleteClientButton id={c.id} name={c.name} />
     </AppShell>
   );
 }
