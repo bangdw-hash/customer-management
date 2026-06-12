@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { Button, Card } from "@/components/ui";
 import { trainer } from "@/lib/mock";
+import { apiPost } from "@/lib/api";
 import { ArrowLeft, Check, Copy, CreditCard, Link2, QrCode, ScanLine, UserPlus } from "lucide-react";
 
 type Method = "qr" | "link" | "manual" | "card";
@@ -13,6 +14,17 @@ export default function NewClient() {
   const [method, setMethod] = useState<Method>("qr");
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [form, setForm] = useState({ name: "", phone: "", goal: "" });
+
+  const saveClient = () => {
+    // 낙관적 UI + 백그라운드 저장(DB 연결 시 영속)
+    if (form.name) apiPost("/api/clients", form);
+    setSaved(true);
+    setTimeout(() => {
+      setSaved(false);
+      setForm({ name: "", phone: "", goal: "" });
+    }, 1500);
+  };
 
   const copy = () => {
     navigator.clipboard?.writeText(`https://${trainer.intakeUrl}`).catch(() => {});
@@ -89,9 +101,33 @@ export default function NewClient() {
         {method === "manual" && (
           <Card className="space-y-3 p-5">
             <p className="text-sm font-bold text-ink-900">직접 입력</p>
-            <Field label="이름" placeholder="고객 이름" />
-            <Field label="연락처" placeholder="010-0000-0000" />
-            <Field label="목표" placeholder="예: 체지방 -5kg" />
+            <div>
+              <label className="text-xs font-semibold text-ink-500">이름</label>
+              <input
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                placeholder="고객 이름"
+                className="mt-1 w-full rounded-xl border border-ink-200 p-3 text-sm outline-none focus:border-brand-400"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-ink-500">연락처</label>
+              <input
+                value={form.phone}
+                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                placeholder="010-0000-0000"
+                className="mt-1 w-full rounded-xl border border-ink-200 p-3 text-sm outline-none focus:border-brand-400"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-ink-500">목표</label>
+              <input
+                value={form.goal}
+                onChange={(e) => setForm((f) => ({ ...f, goal: e.target.value }))}
+                placeholder="예: 체지방 -5kg"
+                className="mt-1 w-full rounded-xl border border-ink-200 p-3 text-sm outline-none focus:border-brand-400"
+              />
+            </div>
             <Field label="생일 (MM-DD)" placeholder="06-18" />
             <div>
               <label className="text-xs font-semibold text-ink-500">건강 특이사항</label>
@@ -101,7 +137,7 @@ export default function NewClient() {
                 placeholder="부상 이력, 주의사항 등"
               />
             </div>
-            <Button className="w-full" onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 1500); }}>
+            <Button className="w-full" onClick={saveClient}>
               {saved ? <><Check size={16} /> 저장됨</> : "고객 저장하기"}
             </Button>
           </Card>

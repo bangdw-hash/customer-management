@@ -1,17 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { Avatar, Badge, Button, Card, SectionTitle } from "@/components/ui";
-import { clientById, clients, KRW, payments } from "@/lib/mock";
+import { clientById, clients, KRW, payments, type Payment } from "@/lib/mock";
+import { apiGet, apiPost } from "@/lib/api";
 import { BadgeCheck, Check, Clock, Plus, Send } from "lucide-react";
 
 export default function PaymentsPage() {
   const [showForm, setShowForm] = useState(false);
   const [sent, setSent] = useState(false);
-  const monthTotal = payments.reduce((s, p) => s + p.amount, 0);
-  const unconfirmed = payments.filter((p) => !p.confirmedByClient);
+  const [pmts, setPmts] = useState<Payment[]>(payments);
+  const [draft, setDraft] = useState({ clientId: clients[0].id, item: "", amount: "", method: "현장카드" });
+
+  useEffect(() => {
+    apiGet<{ payments: Payment[] }>("/api/payments").then((d) => {
+      if (d?.payments?.length) setPmts(d.payments);
+    });
+  }, []);
+
+  const monthTotal = pmts.reduce((s, p) => s + p.amount, 0);
+  const unconfirmed = pmts.filter((p) => !p.confirmedByClient);
+
+  const record = async () => {
+    const amount = Number(draft.amount) || 0;
+    const optimistic: Payment = {
+      id: "tmp_" + Date.now(),
+      clientId: draft.clientId,
+      date: new Date().toISOString().slice(0, 10),
+      amount,
+      method: draft.method as Payment["method"],
+      item: draft.item || "회차권",
+      sessionsAdded: 0,
+      confirmedByClient: false,
+    };
+    setPmts((p) => [optimistic, ...p]);
+    setShowForm(false);
+    setSent(true);
+    setTimeout(() => setSent(false), 2000);
+    apiPost("/api/payments", {
+      clientId: draft.clientId,
+      item: draft.item,
+      amount,
+      method: draft.method,
+    });
+    setDraft({ clientId: clients[0].id, item: "", amount: "", method: "현장카드" });
+  };
 
   return (
     <AppShell title="결제 내역" subtitle="현장 결제 기록 · 고객 공동 확인">
@@ -43,35 +78,46 @@ export default function PaymentsPage() {
       ) : (
         <Card className="mt-3 space-y-3 p-4">
           <p className="text-sm font-bold text-ink-900">결제 기록 추가</p>
-          <select className="w-full rounded-xl border border-ink-200 p-3 text-sm outline-none">
+          <select
+            value={draft.clientId}
+            onChange={(e) => setDraft((d) => ({ ...d, clientId: e.target.value }))}
+            className="w-full rounded-xl border border-ink-200 p-3 text-sm outline-none"
+          >
             {clients.map((c) => (
-              <option key={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
             ))}
           </select>
           <div className="grid grid-cols-2 gap-2">
-            <input placeholder="상품 (예: 30회권)" className="rounded-xl border border-ink-200 p-3 text-sm outline-none" />
-            <input placeholder="금액" inputMode="numeric" className="rounded-xl border border-ink-200 p-3 text-sm outline-none" />
+            <input
+              value={draft.item}
+              onChange={(e) => setDraft((d) => ({ ...d, item: e.target.value }))}
+              placeholder="상품 (예: 30회권)"
+              className="rounded-xl border border-ink-200 p-3 text-sm outline-none"
+            />
+            <input
+              value={draft.amount}
+              onChange={(e) => setDraft((d) => ({ ...d, amount: e.target.value }))}
+              placeholder="금액"
+              inputMode="numeric"
+              className="rounded-xl border border-ink-200 p-3 text-sm outline-none"
+            />
           </div>
           <div className="flex gap-2">
-            {["현장카드", "현금", "계좌이체"].map((m, i) => (
+            {["현장카드", "현금", "계좌이체"].map((m) => (
               <button
                 key={m}
+                onClick={() => setDraft((d) => ({ ...d, method: m }))}
                 className={`flex-1 rounded-xl py-2.5 text-xs font-semibold ${
-                  i === 0 ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600"
+                  draft.method === m ? "bg-brand-600 text-white" : "bg-ink-100 text-ink-600"
                 }`}
               >
                 {m}
               </button>
             ))}
           </div>
-          <Button
-            className="w-full"
-            onClick={() => {
-              setSent(true);
-              setShowForm(false);
-              setTimeout(() => setSent(false), 2000);
-            }}
-          >
+          <Button className="w-full" onClick={record}>
             <Send size={16} /> 기록하고 고객에게 확인 요청
           </Button>
         </Card>
@@ -83,9 +129,9 @@ export default function PaymentsPage() {
       )}
 
       {/* 내역 */}
-      <SectionTitle title="결제 기록" action={`${payments.length}건`} />
+      <SectionTitle title="결제 기록" action={`${pmts.length}건`} />
       <div className="space-y-2.5">
-        {payments.map((p) => {
+        {pmts.map((p) => {
           const c = clientById(p.clientId);
           return (
             <Card key={p.id} className="p-3.5">

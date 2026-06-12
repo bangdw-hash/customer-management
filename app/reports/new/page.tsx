@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { Avatar, Button, Card } from "@/components/ui";
 import { clients } from "@/lib/mock";
+import { apiPost } from "@/lib/api";
 import { ArrowLeft, Check, Mic, Send, Sparkles, Square } from "lucide-react";
 
 type Step = "select" | "record" | "transcribed" | "generated";
@@ -201,7 +202,19 @@ export default function NewReport() {
 
           <Button
             className="mt-4 w-full"
-            onClick={() => { setScheduled(true); setTimeout(() => setScheduled(false), 2000); }}
+            onClick={() => {
+              // 리포트 저장 + 고객에게 발송(키 있으면 실제, 없으면 시뮬레이션)
+              apiPost("/api/reports", {
+                clientId,
+                title: `PT 리포트 — ${client.name}님`,
+                body: report,
+                status: "sent",
+                channel: "kakao",
+              });
+              apiPost("/api/messages/send", { to: client.phone, channel: "kakao_alimtalk", text: report });
+              setScheduled(true);
+              setTimeout(() => setScheduled(false), 2000);
+            }}
           >
             {scheduled ? <><Check size={18} /> 저장 & 발송 예약됨</> : <><Send size={18} /> 리포트 저장하고 보내기</>}
           </Button>

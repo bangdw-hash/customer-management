@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { Avatar, Badge, Card } from "@/components/ui";
-import { clients, ClientStatus } from "@/lib/mock";
+import { clients, ClientStatus, type Client } from "@/lib/mock";
+import { apiGet } from "@/lib/api";
 import { Search, UserPlus } from "lucide-react";
 
 const tabs: { key: ClientStatus | "all"; label: string }[] = [
@@ -23,13 +24,21 @@ const statusBadge: Record<ClientStatus, { tone: string; label: string }> = {
 export default function ClientsPage() {
   const [tab, setTab] = useState<ClientStatus | "all">("active");
   const [q, setQ] = useState("");
+  const [allClients, setAllClients] = useState<Client[]>(clients);
 
-  const list = clients
+  // DB 연결 시 실데이터로 교체, 데모 시 목업 유지
+  useEffect(() => {
+    apiGet<{ clients: Client[] }>("/api/clients").then((d) => {
+      if (d?.clients?.length) setAllClients(d.clients);
+    });
+  }, []);
+
+  const list = allClients
     .filter((c) => (tab === "all" ? true : c.status === tab))
     .filter((c) => c.name.includes(q) || c.phone.includes(q));
 
   return (
-    <AppShell title="고객 현황" subtitle={`총 ${clients.length}명 관리 중`}>
+    <AppShell title="고객 현황" subtitle={`총 ${allClients.length}명 관리 중`}>
       <Link
         href="/clients/new"
         className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white"

@@ -6,9 +6,13 @@ import {
   clients as mockClients,
   payments as mockPayments,
   reviews as mockReviews,
+  reports as mockReports,
+  getBookings,
   type Client,
   type Payment,
   type Review,
+  type Report,
+  type Booking,
 } from "@/lib/mock";
 
 function rowToClient(r: typeof schema.clients.$inferSelect): Client {
@@ -167,4 +171,74 @@ export async function addReview(input: Omit<Review, "id">): Promise<Review> {
     beforeAfter: input.beforeAfter ?? false,
   });
   return rv;
+}
+
+// ===== 예약 =====
+export async function listBookings(): Promise<Booking[]> {
+  const db = getDb();
+  if (!db) return getBookings(new Date());
+  const rows = await db.select().from(schema.bookings);
+  return rows.map((r) => ({
+    id: r.id,
+    clientId: r.clientId ?? undefined,
+    clientName: r.clientName,
+    date: r.date,
+    start: r.start,
+    end: r.endTime,
+    status: r.status as Booking["status"],
+  }));
+}
+
+export async function createBooking(input: Omit<Booking, "id">): Promise<Booking> {
+  const db = getDb();
+  const id = "b_" + Math.random().toString(36).slice(2, 9);
+  const b: Booking = { id, ...input };
+  if (!db) return b;
+  await db.insert(schema.bookings).values({
+    id,
+    trainerId: "t_default",
+    clientId: input.clientId ?? null,
+    clientName: input.clientName,
+    date: input.date,
+    start: input.start,
+    endTime: input.end,
+    status: input.status,
+  });
+  return b;
+}
+
+// ===== 리포트 =====
+export async function listReports(): Promise<Report[]> {
+  const db = getDb();
+  if (!db) return mockReports;
+  const rows = await db.select().from(schema.reports);
+  return rows.map((r) => ({
+    id: r.id,
+    clientId: r.clientId,
+    date: r.date,
+    title: r.title,
+    body: r.body,
+    status: r.status as Report["status"],
+    channel: (r.channel as Report["channel"]) ?? undefined,
+  }));
+}
+
+export async function addReport(input: Omit<Report, "id">): Promise<Report> {
+  const db = getDb();
+  const id = "r_" + Math.random().toString(36).slice(2, 9);
+  const r: Report = { id, ...input };
+  if (!db) {
+    mockReports.push(r);
+    return r;
+  }
+  await db.insert(schema.reports).values({
+    id,
+    clientId: input.clientId,
+    date: input.date,
+    title: input.title,
+    body: input.body,
+    status: input.status,
+    channel: input.channel,
+  });
+  return r;
 }
