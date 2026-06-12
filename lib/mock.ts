@@ -255,3 +255,47 @@ export const reEnrollTargets = () =>
 export const atRiskClients = () => clients.filter((c) => c.status === "at-risk");
 
 export const KRW = (n: number) => n.toLocaleString("ko-KR") + "원";
+
+// ===== 결제 기록 (현장 결제 → 기록 + 고객 공동 확인) =====
+export interface Payment {
+  id: string;
+  clientId: string;
+  date: string;
+  amount: number;
+  method: "현장카드" | "현금" | "계좌이체";
+  item: string;
+  sessionsAdded: number;
+  confirmedByClient: boolean; // 고객이 링크로 확인했는지
+}
+
+export const payments: Payment[] = [
+  { id: "p1", clientId: "c1", date: "2026-01-10", amount: 1200000, method: "현장카드", item: "20회권", sessionsAdded: 20, confirmedByClient: true },
+  { id: "p2", clientId: "c2", date: "2025-11-02", amount: 1650000, method: "계좌이체", item: "30회권", sessionsAdded: 30, confirmedByClient: true },
+  { id: "p3", clientId: "c3", date: "2026-02-20", amount: 980000, method: "현금", item: "16회권", sessionsAdded: 16, confirmedByClient: false },
+];
+
+export const paymentsByClient = (id: string) => payments.filter((p) => p.clientId === id);
+export const unconfirmedPayments = () => payments.filter((p) => !p.confirmedByClient);
+
+// ===== 고객 리뷰 (자연스러운 유도 → 마케팅 소스) =====
+export interface Review {
+  id: string;
+  clientId: string;
+  rating: number; // 1~5
+  text: string;
+  date: string;
+  consentMarketing: boolean; // 홍보 사용 동의
+  beforeAfter?: boolean; // 비포/애프터 첨부 여부
+}
+
+export const reviews: Review[] = [
+  { id: "rv1", clientId: "c1", rating: 5, date: "2026-05-12", consentMarketing: true, beforeAfter: true, text: "3개월 만에 체지방 7%나 빠졌어요! 무릎 통증 걱정했는데 매번 제 컨디션 체크하고 운동 짜주셔서 너무 든든했어요. 김민지 프로님 강추합니다 💪" },
+  { id: "rv2", clientId: "c2", rating: 5, date: "2026-04-30", consentMarketing: true, beforeAfter: false, text: "벤치 60kg에서 92kg까지! 자세 하나하나 잡아주시고 목표를 같이 세워주셔서 운동이 재밌어졌어요." },
+  { id: "rv3", clientId: "c4", rating: 4, date: "2026-02-15", consentMarketing: false, beforeAfter: true, text: "24회 동안 9kg 감량 성공. 식단까지 꼼꼼히 봐주셨어요. 감사합니다!" },
+];
+
+export const reviewsByClient = (id: string) => reviews.filter((r) => r.clientId === id);
+export const marketingReviews = () => reviews.filter((r) => r.consentMarketing);
+// 리뷰 요청 적기: 성과 좋고 아직 리뷰 없는 활성 고객
+export const reviewRequestTargets = () =>
+  clients.filter((c) => c.status === "active" && reviewsByClient(c.id).length === 0);
