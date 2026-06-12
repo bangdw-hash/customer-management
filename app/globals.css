@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Pretendard", "Apple SD Gothic Neo", -apple-system, sans-serif;
+}
+
+html,
+body {
+  background: #f1f5f9;
+  color: #0f172a;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 모바일 우선: 데스크탑에서도 모바일 폭으로 중앙 정렬 */
+.phone-frame {
+  max-width: 460px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: #f8fafc;
+  position: relative;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  70% { box-shadow: 0 0 0 16px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+.recording {
+  animation: pulse-ring 1.5s infinite;
+}
