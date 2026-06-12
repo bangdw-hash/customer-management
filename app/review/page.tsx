@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Button, Card } from "@/components/ui";
 import { trainer } from "@/lib/mock";
 import { apiPost } from "@/lib/api";
-import { Camera, Check, Heart, Star } from "lucide-react";
+import PhotoCapture from "@/components/PhotoCapture";
+import { Check, Heart, Star } from "lucide-react";
 
 const QUICK = ["친절해요", "성과가 좋아요", "꼼꼼해요", "동기부여 최고", "시설이 좋아요"];
 
@@ -91,10 +92,10 @@ export default function ReviewPage() {
           className="w-full rounded-xl border border-ink-200 p-3 text-sm outline-none focus:border-brand-400"
         />
 
-        {/* 사진 첨부 */}
-        <button className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ink-200 bg-white py-3 text-sm font-semibold text-ink-500">
-          <Camera size={18} /> 비포/애프터 사진 첨부 (선택)
-        </button>
+        {/* 사진 첨부 — 실제 카메라 */}
+        <div className="mt-2">
+          <PhotoCapture label="비포/애프터 사진 첨부 (선택)" />
+        </div>
 
         {/* 마케팅 동의 */}
         <button
