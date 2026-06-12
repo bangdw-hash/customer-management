@@ -14,11 +14,12 @@ export default function ReviewPage() {
   const [text, setText] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [consent, setConsent] = useState(true);
+  const [photoUrl, setPhotoUrl] = useState("");
   const [done, setDone] = useState(false);
 
   const submit = () => {
     const body = text || (tags.length ? tags.join(", ") : "");
-    apiPost("/api/reviews", { rating, text: body, consentMarketing: consent });
+    apiPost("/api/reviews", { rating, text: body, consentMarketing: consent, photoUrl: photoUrl || undefined });
     setDone(true);
   };
 
@@ -94,7 +95,7 @@ export default function ReviewPage() {
 
         {/* 사진 첨부 — 실제 카메라 */}
         <div className="mt-2">
-          <PhotoCapture label="비포/애프터 사진 첨부 (선택)" />
+          <PhotoCapture label="비포/애프터 사진 첨부 (선택)" onUploaded={setPhotoUrl} />
         </div>
 
         {/* 마케팅 동의 */}

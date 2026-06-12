@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS clients (
   phone text,
   grad_from text NOT NULL DEFAULT '#a855f7',
   grad_to text NOT NULL DEFAULT '#ec4899',
+  photo_url text,
   goal text,
   status text NOT NULL DEFAULT 'active',
   joined_at text,
@@ -80,6 +81,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   date text NOT NULL,
   consent_marketing boolean NOT NULL DEFAULT false,
   before_after boolean NOT NULL DEFAULT false,
+  photo_url text,
   created_at timestamptz DEFAULT now()
 );
 CREATE TABLE IF NOT EXISTS settings (
@@ -90,6 +92,9 @@ CREATE TABLE IF NOT EXISTS settings (
   ai_key_enc text,
   updated_at timestamptz DEFAULT now()
 );
+-- 기존 테이블에도 사진 컬럼 추가(있으면 무시)
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS photo_url text;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS photo_url text;
 `;
 
 export async function POST(req: Request) {

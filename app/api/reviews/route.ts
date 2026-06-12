@@ -19,7 +19,8 @@ export async function POST(req: Request) {
     text: b.text ?? "",
     date: b.date ?? new Date().toISOString().slice(0, 10),
     consentMarketing: !!b.consentMarketing,
-    beforeAfter: !!b.beforeAfter,
+    beforeAfter: !!b.beforeAfter || !!b.photoUrl,
+    photoUrl: b.photoUrl,
   });
   return Response.json({ review }, { status: 201 });
 }

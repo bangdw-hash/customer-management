@@ -26,6 +26,7 @@ export const clients = pgTable("clients", {
   phone: text("phone"),
   gradFrom: text("grad_from").notNull().default("#a855f7"),
   gradTo: text("grad_to").notNull().default("#ec4899"),
+  photoUrl: text("photo_url"),
   goal: text("goal"),
   status: text("status").notNull().default("active"), // active | at-risk | past
   joinedAt: text("joined_at"),
@@ -90,6 +91,7 @@ export const reviews = pgTable("reviews", {
   date: text("date").notNull(),
   consentMarketing: boolean("consent_marketing").notNull().default(false),
   beforeAfter: boolean("before_after").notNull().default(false),
+  photoUrl: text("photo_url"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

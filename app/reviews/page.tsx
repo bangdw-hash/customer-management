@@ -138,6 +138,10 @@ export default function ReviewsPage() {
                 </div>
                 <p className="mt-2 text-sm leading-relaxed">“{r.text}”</p>
               </div>
+              {r.photoUrl && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={r.photoUrl} alt="후기 사진" className="max-h-60 w-full object-cover" />
+              )}
               <div className="flex items-center gap-2 p-3">
                 <Avatar name={c?.name ?? "고객"} gradient={c?.grad} size={28} />
                 <div className="flex-1">
