@@ -6,6 +6,7 @@ import AppShell from "@/components/AppShell";
 import { Button, Card } from "@/components/ui";
 import { trainer } from "@/lib/mock";
 import { apiPost } from "@/lib/api";
+import PhotoCapture from "@/components/PhotoCapture";
 import { ArrowLeft, Check, Copy, CreditCard, Link2, QrCode, ScanLine, UserPlus } from "lucide-react";
 
 type Method = "qr" | "link" | "manual" | "card";
@@ -147,13 +148,8 @@ export default function NewClient() {
           <Card className="p-6 text-center">
             <p className="text-sm font-bold text-ink-900">명함 등록</p>
             <p className="mb-4 text-xs text-ink-400">사진을 올리면 연락처를 자동 인식(OCR)합니다</p>
-            <div className="mx-auto flex h-40 w-full items-center justify-center rounded-2xl border-2 border-dashed border-ink-200 bg-ink-50">
-              <div className="text-center text-ink-400">
-                <CreditCard size={40} className="mx-auto" />
-                <p className="mt-2 text-xs">명함 사진 촬영 / 업로드</p>
-              </div>
-            </div>
-            <Button variant="outline" className="mt-4 w-full">사진 선택</Button>
+            <PhotoCapture label="명함 사진 촬영 / 업로드" />
+            <p className="mt-3 text-[11px] text-ink-400">촬영 후 연락처가 자동 인식(OCR)됩니다.</p>
           </Card>
         )}
       </div>

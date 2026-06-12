@@ -45,6 +45,15 @@ export default function PaymentsPage() {
       amount,
       method: draft.method,
     });
+    // 고객에게 결제 확인 요청 문자 (Solapi 키 있으면 실발송, 없으면 시뮬레이션)
+    const cust = clients.find((c) => c.id === draft.clientId);
+    if (cust?.phone) {
+      apiPost("/api/messages/send", {
+        to: cust.phone,
+        channel: "sms",
+        text: `[${cust.name}님] 결제 내역을 확인해주세요. ${optimistic.item} ${KRW(amount)} → 확인 링크에서 '내역 확인'을 눌러주세요.`,
+      });
+    }
     setDraft({ clientId: clients[0].id, item: "", amount: "", method: "현장카드" });
   };
 
