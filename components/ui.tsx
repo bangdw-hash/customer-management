@@ -23,8 +23,8 @@ export function SectionTitle({
   href?: string;
 }) {
   return (
-    <div className="mb-2 mt-5 flex items-center justify-between px-1">
-      <h2 className="text-[15px] font-bold text-ink-900">{title}</h2>
+    <div className="mb-3 mt-7 flex items-center justify-between px-1">
+      <h2 className="text-[15px] font-extrabold tracking-tight text-ink-900">{title}</h2>
       {action &&
         (href ? (
           <Link href={href} className="flex items-center text-xs font-medium text-brand-600">

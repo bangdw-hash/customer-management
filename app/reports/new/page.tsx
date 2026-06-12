@@ -43,20 +43,27 @@ export default function NewReport() {
     }, 600);
   };
 
-  const generate = () => {
+  const generate = async () => {
     setGenerating(true);
-    // AI 생성 시뮬레이션 (실제로는 관리자 화면의 API Key로 LLM 호출)
-    setTimeout(() => {
-      setReport(
-        `${client.name}님, 오늘도 수고 많으셨어요! 💪\n\n` +
-          `[오늘의 세션]\n- 하체 저충격 루틴 (무릎 보호) + 코어 안정화\n- 스쿼트 폼이 지난주 대비 확연히 안정적이었어요. 플랭크 1분 성공! 👏\n\n` +
-          `[변화 포인트]\n- 체지방 감소로 컨디션이 한층 좋아 보였습니다.\n\n` +
-          `[다음 목표]\n- 다음 주부터 유산소 인터벌을 추가해 감량에 가속을 붙여봐요.\n\n` +
-          `잔여 ${client.remainingSessions}회 남았어요. 지금 흐름이 정말 좋아서, 이어서 목표까지 함께 가면 좋겠습니다! 😊`
-      );
+    // 실제 백엔드 호출: 키가 설정돼 있으면 AI 생성, 없으면 서버가 템플릿으로 폴백
+    try {
+      const res = await fetch("/api/reports/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientName: client.name,
+          transcript,
+          remainingSessions: client.remainingSessions,
+        }),
+      });
+      const data = await res.json();
+      setReport(data.report ?? "");
+    } catch {
+      setReport(`${client.name}님, 오늘도 수고 많으셨어요! 💪\n\n오늘 세션 잘 소화하셨어요. 다음에도 함께 목표까지 가요!`);
+    } finally {
       setGenerating(false);
       setStep("generated");
-    }, 1400);
+    }
   };
 
   return (
